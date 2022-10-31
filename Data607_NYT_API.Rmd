@@ -1,0 +1,78 @@
+---
+title: "NYT API"
+author: "Johnny Rodriguez"
+date: "2022-10-31"
+output:
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float:
+      collapsed: true
+    toc_depth: 4
+    number_sections: false
+    highlight: pygments
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+```
+
+###Introduction -  New York Times API
+For this assignment, I enabled the Books, Movies and top stories NYT API to explore data.  To prepare for this, I created an account and generated an authorization key to be able to request data from NYT servers.
+
+
+```{r echo=FALSE}
+
+NYT_Key = 'lvPrwZbdxZkCgk4FXdcMGI6AUS6c1aHx'
+
+
+```
+<br/>
+
+### Loading Libraries
+The library to read and load the NYT API data, in JSON format, is jsonlite. Once read as a dataframe, tidy verse cleanup can be applied for further data exploration.
+
+
+```{r echo = TRUE ,warning = FALSE, message = FALSE }
+
+library(jsonlite)
+
+```
+
+<br/>
+
+### Books & Popular Article API
+
+There are two API requests I made.  The first returns the best sellers by type (hardcover, paperback, etc) from the Book List.  The second API request performed a query for Anne Rice books (since a family recently mentioned her book was turned into a series) from Book Reviews.  Both were read as data frames.
+
+```{r}
+
+#Reads the Book list API request and reads it into a dataframe.
+best_seller_types <- fromJSON(paste0("http://api.nytimes.com/svc/books/v3/lists/names.json?api-key=",NYT_Key))
+best_seller_types <- best_seller_types$results
+class(best_seller_types)
+knitr::kable(head(best_seller_types, n=3))
+
+
+# Reads the Reviews API request for Anne Rice Books and read it into a date frame.
+Rice_Books<-fromJSON(paste0("https://api.nytimes.com/svc/books/v3/reviews.json?author=Anne+Rice&api-key=",NYT_Key))
+Rice_Books<-Rice_Books$results
+class(Rice_Books)
+knitr::kable(head(Rice_Books, n=2))
+
+# Reads the Popular Articles API request for those shared on Facebook.
+FB_PopArticles<-fromJSON(paste0("https://api.nytimes.com/svc/mostpopular/v2/shared/1/facebook.json?api-key=",NYT_Key), flatten = TRUE)
+FB_PopArticles<-FB_PopArticles$results
+class(FB_PopArticles)
+knitr::kable(head(FB_PopArticles, n=2))
+
+```
+
+<br/>
+
+### Conclusion
+jsonlite reads JSON files well when well structured.  The automatic conversion into a relatively clean dataframe allow for easier cleanup and further exploration.  The above dataframes, date columns can be be converted from the characters values, columns can be split for further analysis or additional regex string matches can be made.
+
+
